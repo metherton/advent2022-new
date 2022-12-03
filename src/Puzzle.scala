@@ -70,14 +70,38 @@ case class Puzzle4(l: List[String]) extends Puzzle {
   }
 }
 
-object Puzzles {
+case class Puzzle5(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+    val priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    val result = l.foldLeft(0)((acc, el) => {
+      val (first, second) = el.splitAt(el.length/2)
+      val prio = first.dropWhile(h => !second.contains(h)).head
+      acc + priorities.indexOf(prio) + 1
+    })
+    println(s"Result of puzzle 5 is: $result")
+  }
+}
 
-  val l1 = Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/3.txt").getLines.toList
+case class Puzzle6(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+    val priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    val group = l.grouped(3).toList
+    val result = group.foldLeft(0)((acc, el) => {
+      val prio = el(0).dropWhile(h => !(el(1).contains(h) && el(2).contains(h))).head
+      acc + priorities.indexOf(prio) + 1
+    })
+    println(s"Result of puzzle 6 is: $result")
+  }
+}
+object Puzzles {
   val sourceLists = (for {
-    i <- 1 to 4
+    i <- 1 to 6
   } yield Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/$i.txt").getLines.toList).toList
   val puzzles = List(new Puzzle1(sourceLists(0)),
     new Puzzle2(sourceLists(1)),
     new Puzzle3(sourceLists(2)),
-    new Puzzle4(sourceLists(3)))
+    new Puzzle4(sourceLists(3)),
+    new Puzzle5(sourceLists(4)),
+    new Puzzle6(sourceLists(4)))
+
 }
