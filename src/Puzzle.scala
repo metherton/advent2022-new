@@ -93,15 +93,54 @@ case class Puzzle6(l: List[String]) extends Puzzle {
     println(s"Result of puzzle 6 is: $result")
   }
 }
+
+case class Puzzle7(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+    val list = l.map(el => el.split(",")).map(arr => (arr(0).split("-").map(_.toInt), arr(1).split("-").map(_.toInt)))
+
+    val result = list.foldLeft(0)((acc, tup) => {
+      if ((tup._1(0) >= tup._2(0) && tup._1(1) <= tup._2(1)) ||
+        (tup._2(0) >= tup._1(0) && tup._2(1) <= tup._1(1))) {
+          acc + 1
+      } else {
+        acc
+      }
+    })
+
+    println(s"Result of puzzle 7 is: $result")
+  }
+}
+
+case class Puzzle8(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+    val list = l.map(el => el.split(",")).map(arr => (arr(0).split("-").map(_.toInt), arr(1).split("-").map(_.toInt)))
+
+    val result = list.foldLeft(0)((acc, tup) => {
+      if (((tup._1(0) <= tup._2(0) && tup._1(1) >= tup._2(0)) ||
+        (tup._2(0) <= tup._1(0) && tup._2(1) >= tup._1(1))) ||
+        ((tup._1(0) <= tup._2(0) && tup._1(1) >= tup._2(0)) ||
+          (tup._2(0) <= tup._1(0) && tup._2(1) >= tup._1(0)))) {
+        acc + 1
+      } else {
+        acc
+      }
+    })
+
+    println(s"Result of puzzle 8 is: $result")
+  }
+}
 object Puzzles {
   val sourceLists = (for {
-    i <- 1 to 6
+    i <- 1 to 8
   } yield Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/$i.txt").getLines.toList).toList
   val puzzles = List(new Puzzle1(sourceLists(0)),
     new Puzzle2(sourceLists(1)),
     new Puzzle3(sourceLists(2)),
     new Puzzle4(sourceLists(3)),
     new Puzzle5(sourceLists(4)),
-    new Puzzle6(sourceLists(4)))
+    new Puzzle6(sourceLists(5)),
+    new Puzzle7(sourceLists(6)),
+    new Puzzle8(sourceLists(7))
+  )
 
 }
