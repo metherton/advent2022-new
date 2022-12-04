@@ -116,10 +116,7 @@ case class Puzzle8(l: List[String]) extends Puzzle {
     val list = l.map(el => el.split(",")).map(arr => (arr(0).split("-").map(_.toInt), arr(1).split("-").map(_.toInt)))
 
     val result = list.foldLeft(0)((acc, tup) => {
-      if (((tup._1(0) <= tup._2(0) && tup._1(1) >= tup._2(0)) ||
-        (tup._2(0) <= tup._1(0) && tup._2(1) >= tup._1(1))) ||
-        ((tup._1(0) <= tup._2(0) && tup._1(1) >= tup._2(0)) ||
-          (tup._2(0) <= tup._1(0) && tup._2(1) >= tup._1(0)))) {
+      if (tup._1(0) <= tup._2(1) && tup._1(1) >= tup._2(0)) {
         acc + 1
       } else {
         acc
