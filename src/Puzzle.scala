@@ -126,9 +126,235 @@ case class Puzzle8(l: List[String]) extends Puzzle {
     println(s"Result of puzzle 8 is: $result")
   }
 }
+
+case class Puzzle9(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+    val Pattern = "move.*".r
+    val NumberPattern = " 1.*".r
+    val result = l.foldLeft(List[List[String]](List(), List(), List(), List(), List(), List(), List(), List(), List()): List[List[String]])((acc, el) => el match {
+      case "" => List(acc(0).reverse, acc(1).reverse, acc(2).reverse, acc(3).reverse, acc(4).reverse, acc(5).reverse, acc(6).reverse, acc(7).reverse, acc(8).reverse)
+      case Pattern() => {
+        val moves = el.split(" ").toList.filter(e => e.forall(Character.isDigit)).map(_.toInt)
+        val letterToMove = acc(moves(1) - 1).take(moves(0)).reverse
+        val acc0 = if (moves(1) - 1 == 0) {
+          acc(moves(1) - 1).drop(moves(0))
+        } else if (moves(2) - 1 == 0) {
+          letterToMove ::: acc(0)
+        } else {
+          acc(0)
+        }
+        val acc1 = if (moves(1) - 1 == 1) {
+          acc(1).drop(moves(0))
+        } else if (moves(2) - 1 == 1) {
+          letterToMove ::: acc(1)
+        } else {
+          acc(1)
+        }
+        val acc2 = if (moves(1) - 1 == 2) {
+          acc(2).drop(moves(0))
+        } else if (moves(2) - 1 == 2) {
+          letterToMove ::: acc(2)
+        } else {
+          acc(2)
+        }
+        val acc3 = if (moves(1) - 1 == 3) {
+          acc(3).drop(moves(0))
+        } else if (moves(2) - 1 == 3) {
+          letterToMove ::: acc(3)
+        } else {
+          acc(3)
+        }
+        val acc4 = if (moves(1) - 1 == 4) {
+          acc(4).drop(moves(0))
+        } else if (moves(2) - 1 == 4) {
+          letterToMove ::: acc(4)
+        } else {
+          acc(4)
+        }
+        val acc5 = if (moves(1) - 1 == 5) {
+          acc(5).drop(moves(0))
+        } else if (moves(2) - 1 == 5) {
+          letterToMove ::: acc(5)
+        } else {
+          acc(5)
+        }
+        val acc6 = if (moves(1) - 1 == 6) {
+          acc(6).drop(moves(0))
+        } else if (moves(2) - 1 == 6) {
+          letterToMove ::: acc(6)
+        } else {
+          acc(6)
+        }
+        val acc7 = if (moves(1) - 1 == 7) {
+          acc(7).drop(moves(0))
+        } else if (moves(2) - 1 == 7) {
+          letterToMove ::: acc(7)
+        } else {
+          acc(7)
+        }
+        val acc8 = if (moves(1) - 1 == 8) {
+          acc(8).drop(moves(0))
+        } else if (moves(2) - 1 == 8) {
+          letterToMove ::: acc(8)
+        } else {
+          acc(8)
+        }
+
+        val newAcc = List(acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
+        newAcc
+      }
+      case NumberPattern() => acc
+      case line => {
+        val acc0: List[String] = if (!line.charAt(1).isWhitespace && !line.charAt(1).isDigit ) { line.charAt(1).toString :: acc(0)} else {acc(0)}
+        val acc1: List[String] = if (!line.charAt(5).isWhitespace && !line.charAt(5).isDigit ) {line.charAt(5).toString :: acc(1)} else {acc(1)}
+        val acc2: List[String] = if (!line.charAt(9).isWhitespace && !line.charAt(9).isDigit ) {line.charAt(9).toString :: acc(2)} else {acc(2)}
+        val acc3: List[String] = if (!line.charAt(13).isWhitespace && !line.charAt(13).isDigit ) {line.charAt(13).toString :: acc(3)} else {acc(3)}
+        val acc4: List[String] = if (!line.charAt(17).isWhitespace && !line.charAt(17).isDigit ) {line.charAt(17).toString :: acc(4)} else {acc(4)}
+        val acc5: List[String] = if (!line.charAt(21).isWhitespace && !line.charAt(21).isDigit ) {line.charAt(21).toString :: acc(5)} else {acc(5)}
+        val acc6: List[String] = if (!line.charAt(25).isWhitespace && !line.charAt(25).isDigit ) {line.charAt(25).toString :: acc(6)} else {acc(6)}
+        val acc7: List[String] = if (!line.charAt(29).isWhitespace && !line.charAt(29).isDigit ) {line.charAt(29).toString :: acc(7)} else {acc(7)}
+        val acc8: List[String] = if (!line.charAt(33).isWhitespace && !line.charAt(33).isDigit ) {line.charAt(33).toString :: acc(8)} else {acc(8)}
+        List[List[String]](acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
+      }
+    }).map(l => l.head).mkString
+    println(s"Result of puzzle 9 is: $result")
+  }
+}
+
+case class Puzzle10(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+
+    val Pattern = "move.*".r
+    val NumberPattern = " 1.*".r
+    val result = l.foldLeft(List[List[String]](List(), List(), List(), List(), List(), List(), List(), List(), List()): List[List[String]])((acc, el) => el match {
+      case "" => List(acc(0).reverse, acc(1).reverse, acc(2).reverse, acc(3).reverse, acc(4).reverse, acc(5).reverse, acc(6).reverse, acc(7).reverse, acc(8).reverse)
+      case Pattern() => {
+        val moves = el.split(" ").toList.filter(e => e.forall(Character.isDigit)).map(_.toInt)
+        val letterToMove = acc(moves(1) - 1).take(moves(0))//.reverse
+        val acc0 = if (moves(1) - 1 == 0) {
+          acc(moves(1) - 1).drop(moves(0))
+        } else if (moves(2) - 1 == 0) {
+          letterToMove ::: acc(0)
+        } else {
+          acc(0)
+        }
+        val acc1 = if (moves(1) - 1 == 1) {
+          acc(1).drop(moves(0))
+        } else if (moves(2) - 1 == 1) {
+          letterToMove ::: acc(1)
+        } else {
+          acc(1)
+        }
+        val acc2 = if (moves(1) - 1 == 2) {
+          acc(2).drop(moves(0))
+        } else if (moves(2) - 1 == 2) {
+          letterToMove ::: acc(2)
+        } else {
+          acc(2)
+        }
+        val acc3 = if (moves(1) - 1 == 3) {
+          acc(3).drop(moves(0))
+        } else if (moves(2) - 1 == 3) {
+          letterToMove ::: acc(3)
+        } else {
+          acc(3)
+        }
+        val acc4 = if (moves(1) - 1 == 4) {
+          acc(4).drop(moves(0))
+        } else if (moves(2) - 1 == 4) {
+          letterToMove ::: acc(4)
+        } else {
+          acc(4)
+        }
+        val acc5 = if (moves(1) - 1 == 5) {
+          acc(5).drop(moves(0))
+        } else if (moves(2) - 1 == 5) {
+          letterToMove ::: acc(5)
+        } else {
+          acc(5)
+        }
+        val acc6 = if (moves(1) - 1 == 6) {
+          acc(6).drop(moves(0))
+        } else if (moves(2) - 1 == 6) {
+          letterToMove ::: acc(6)
+        } else {
+          acc(6)
+        }
+        val acc7 = if (moves(1) - 1 == 7) {
+          acc(7).drop(moves(0))
+        } else if (moves(2) - 1 == 7) {
+          letterToMove ::: acc(7)
+        } else {
+          acc(7)
+        }
+        val acc8 = if (moves(1) - 1 == 8) {
+          acc(8).drop(moves(0))
+        } else if (moves(2) - 1 == 8) {
+          letterToMove ::: acc(8)
+        } else {
+          acc(8)
+        }
+
+        val newAcc = List(acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
+        newAcc
+      }
+      case NumberPattern() => acc
+      case line => {
+        val acc0: List[String] = if (!line.charAt(1).isWhitespace && !line.charAt(1).isDigit) {
+          line.charAt(1).toString :: acc(0)
+        } else {
+          acc(0)
+        }
+        val acc1: List[String] = if (!line.charAt(5).isWhitespace && !line.charAt(5).isDigit) {
+          line.charAt(5).toString :: acc(1)
+        } else {
+          acc(1)
+        }
+        val acc2: List[String] = if (!line.charAt(9).isWhitespace && !line.charAt(9).isDigit) {
+          line.charAt(9).toString :: acc(2)
+        } else {
+          acc(2)
+        }
+        val acc3: List[String] = if (!line.charAt(13).isWhitespace && !line.charAt(13).isDigit) {
+          line.charAt(13).toString :: acc(3)
+        } else {
+          acc(3)
+        }
+        val acc4: List[String] = if (!line.charAt(17).isWhitespace && !line.charAt(17).isDigit) {
+          line.charAt(17).toString :: acc(4)
+        } else {
+          acc(4)
+        }
+        val acc5: List[String] = if (!line.charAt(21).isWhitespace && !line.charAt(21).isDigit) {
+          line.charAt(21).toString :: acc(5)
+        } else {
+          acc(5)
+        }
+        val acc6: List[String] = if (!line.charAt(25).isWhitespace && !line.charAt(25).isDigit) {
+          line.charAt(25).toString :: acc(6)
+        } else {
+          acc(6)
+        }
+        val acc7: List[String] = if (!line.charAt(29).isWhitespace && !line.charAt(29).isDigit) {
+          line.charAt(29).toString :: acc(7)
+        } else {
+          acc(7)
+        }
+        val acc8: List[String] = if (!line.charAt(33).isWhitespace && !line.charAt(33).isDigit) {
+          line.charAt(33).toString :: acc(8)
+        } else {
+          acc(8)
+        }
+        List[List[String]](acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
+      }
+    }).map(l => l.head).mkString
+    println(s"Result of puzzle 10 is: $result")
+  }
+}
+
 object Puzzles {
   val sourceLists = (for {
-    i <- 1 to 8
+    i <- 1 to 10
   } yield Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/$i.txt").getLines.toList).toList
   val puzzles = List(new Puzzle1(sourceLists(0)),
     new Puzzle2(sourceLists(1)),
@@ -137,7 +363,9 @@ object Puzzles {
     new Puzzle5(sourceLists(4)),
     new Puzzle6(sourceLists(5)),
     new Puzzle7(sourceLists(6)),
-    new Puzzle8(sourceLists(7))
+    new Puzzle8(sourceLists(7)),
+    new Puzzle9(sourceLists(8)),
+    new Puzzle10(sourceLists(9))
   )
 
 }
