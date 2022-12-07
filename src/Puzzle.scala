@@ -4,6 +4,29 @@ trait Puzzle {
   def run(): Unit
 }
 
+object Puzzles {
+  val sourceLists = (for {
+    i <- 1 to 14
+  } yield Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/$i.txt").getLines.toList).toList
+  val puzzles = List(new Puzzle1(sourceLists(0)),
+    new Puzzle2(sourceLists(1)),
+    new Puzzle3(sourceLists(2)),
+    new Puzzle4(sourceLists(3)),
+    new Puzzle5(sourceLists(4)),
+    new Puzzle6(sourceLists(5)),
+    new Puzzle7(sourceLists(6)),
+    new Puzzle8(sourceLists(7)),
+    new Puzzle9(sourceLists(8)),
+    new Puzzle10(sourceLists(9)),
+    new Puzzle11(sourceLists(10)),
+    new Puzzle12(sourceLists(11)),
+    new Puzzle13(sourceLists(12)),
+    new Puzzle14(sourceLists(13))
+  )
+
+}
+
+
 case class Puzzle1(l: List[String]) extends Puzzle {
   override def run(): Unit = {
     val newc = l.foldLeft(List[List[String]](List()))((acc, el) => {
@@ -352,20 +375,107 @@ case class Puzzle10(l: List[String]) extends Puzzle {
   }
 }
 
-object Puzzles {
-  val sourceLists = (for {
-    i <- 1 to 10
-  } yield Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/$i.txt").getLines.toList).toList
-  val puzzles = List(new Puzzle1(sourceLists(0)),
-    new Puzzle2(sourceLists(1)),
-    new Puzzle3(sourceLists(2)),
-    new Puzzle4(sourceLists(3)),
-    new Puzzle5(sourceLists(4)),
-    new Puzzle6(sourceLists(5)),
-    new Puzzle7(sourceLists(6)),
-    new Puzzle8(sourceLists(7)),
-    new Puzzle9(sourceLists(8)),
-    new Puzzle10(sourceLists(9))
-  )
 
+case class Puzzle11(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+
+    val line: String = l.head
+    val result = line.foldLeft((0, 0, 0))((acc, letter) => {
+      if (acc._3 != 0 || acc._2 == 0) {
+        (acc._1, acc._2 + 1, acc._3)
+      //} //else if (acc._2 < 4) {
+       // (acc._1, acc._2 + 1, acc._3)
+      } else {
+        // this is happy flow when we find valid letter
+        val sub = line.substring(acc._1, acc._2)
+        if (!sub.contains(letter) && acc._2 >= acc._1 + 3) {
+          (acc._1, acc._2, acc._2 + 1)
+        } else {
+          val newFirst = sub.indexOf(letter) + acc._1 + 1
+          (newFirst, acc._2 + 1, 0)
+        }
+      }
+    })
+
+
+    println(s"Result of puzzle 11 is: ${result._3}")
+  }
+}
+
+case class Puzzle12(l: List[String]) extends Puzzle {
+  override def run(): Unit = {
+
+    val line: String = l.head
+    val result = line.foldLeft((0, 0, 0))((acc, letter) => {
+      if (acc._3 != 0 || acc._2 == 0) {
+        (acc._1, acc._2 + 1, acc._3)
+        //} //else if (acc._2 < 4) {
+        // (acc._1, acc._2 + 1, acc._3)
+      } else {
+        // this is happy flow when we find valid letter
+        val sub = line.substring(acc._1, acc._2)
+        if (!sub.contains(letter) && acc._2 >= acc._1 + 13) {
+          (acc._1, acc._2, acc._2 + 1)
+        } else {
+          val newFirst = sub.indexOf(letter) + acc._1 + 1
+          (newFirst, acc._2 + 1, 0)
+        }
+      }
+    })
+
+
+    println(s"Result of puzzle 12 is: ${result._3}")
+  }
+}
+
+
+case class Puzzle13(l: List[String]) extends Puzzle {
+
+  case class File(name: String, fileType: String, fileSize: Int, children: List[File], parent: File)
+  override def run(): Unit = {
+    val Root = "\\$ cd /".r
+    val Ls = "\\$ ls".r
+    val Dir = raw"dir (.*)".r
+    val FileMatcher = raw"([0-9].*) (.*)".r
+    val Cd = "\\$ cd (.*)".r
+    val BackCd = "\\$ cd ..".r
+
+
+    val res = l.foldLeft(File("/", "D", 0, List(), null))((acc, l) => l match {
+     case Root() => acc
+     case Cd(dirname) => {
+       File(dirname, "D", 0, List(), acc)
+     }
+     case BackCd() => {
+         println("cd")
+       acc.parent
+     }
+     case Ls() => acc
+     case Dir(dirname) => {
+       File(acc.name, acc.fileType, acc.fileSize, File(dirname, "D", 0, List(), acc) :: acc.children, acc.parent)
+     }
+     case FileMatcher(fileSize, fileName) => {
+       File(acc.name, acc.fileType, acc.fileSize, File(fileName, "F", fileSize.toInt, List(), acc) :: acc.children, acc.parent)
+     }
+     case _ => acc
+   })
+
+
+    println(s"Result of puzzle 13 is: ${res.name}")
+  }
+}
+
+
+case class Puzzle14(l: List[String]) extends Puzzle {
+
+
+
+  override def run(): Unit = {
+
+
+
+
+
+    println(s"Result of puzzle 14 is: ")
+  }
 }
