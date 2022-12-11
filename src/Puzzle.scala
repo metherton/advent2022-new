@@ -431,8 +431,13 @@ case class Puzzle12(l: List[String]) extends Puzzle {
 
 case class Puzzle13(l: List[String]) extends Puzzle {
 
+  trait FileElement
+  case class Directory(name: String, fileElements: Set[FileElement]) extends FileElement
+  case class PlainFile(name: String, fileSize: Int) extends FileElement
   case class File(name: String, fileType: String, fileSize: Int, children: List[File], parent: File)
+
   override def run(): Unit = {
+
     val Root = "\\$ cd /".r
     val Ls = "\\$ ls".r
     val Dir = raw"dir (.*)".r
@@ -440,28 +445,23 @@ case class Puzzle13(l: List[String]) extends Puzzle {
     val Cd = "\\$ cd (.*)".r
     val BackCd = "\\$ cd ..".r
 
+    type FileStructure = Map[List[String], Set[FileElement]]
 
-    val res = l.foldLeft(File("/", "D", 0, List(), null))((acc, l) => l match {
-     case Root() => acc
-     case Cd(dirname) => {
-       File(dirname, "D", 0, List(), acc)
-     }
-     case BackCd() => {
-         println("cd")
-       acc.parent
-     }
-     case Ls() => acc
-     case Dir(dirname) => {
-       File(acc.name, acc.fileType, acc.fileSize, File(dirname, "D", 0, List(), acc) :: acc.children, acc.parent)
-     }
-     case FileMatcher(fileSize, fileName) => {
-       File(acc.name, acc.fileType, acc.fileSize, File(fileName, "F", fileSize.toInt, List(), acc) :: acc.children, acc.parent)
-     }
-     case _ => acc
-   })
+    val result: (List[String], FileStructure) = l.foldLeft((List.empty[String], Map.empty: FileStructure)) {
+      case ((path, content), line) => line match {
+        case Cd(dirname) => dirname match {
+          case ".." => (path.init, content)
+          case _ => (dirname :: path, content)
+        }
+        case Ls() => (path, content)
+        case Dir(dirname) => (path,content + (path -> (content.getOrElse(path,Set.empty[FileElement]) + Directory(dirname, Set.empty))))
+        case FileMatcher(fileSize, fileName) => (path,content + (path -> (content.getOrElse(path,Set.empty[FileElement]) + PlainFile(fileName, fileSize.toInt))))
+        case _ => (path, content)
+      }
+    }
 
 
-    println(s"Result of puzzle 13 is: ${res.name}")
+    println(s"Result of puzzle 13 is: $result")
   }
 }
 
