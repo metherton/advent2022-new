@@ -451,7 +451,7 @@ case class Puzzle13(l: List[String]) extends Puzzle {
       case ((path, content), line) => line match {
         case Cd(dirname) => dirname match {
           case ".." => (path.init, content)
-          case _ => (dirname :: path, content)
+          case _ => (path :+ dirname, content)
         }
         case Ls() => (path, content)
         case Dir(dirname) => (path,content + (path -> (content.getOrElse(path,Set.empty[FileElement]) + Directory(dirname, Set.empty))))
@@ -461,7 +461,26 @@ case class Puzzle13(l: List[String]) extends Puzzle {
     }
 
 
+    val directories = result._2.keySet.toList//.sortBy(_.size)
+
+    def subdirectoryOf(value: List[String]): List[List[String]] = {
+      directories.filter(dirs => value.forall(d => dirs.contains(d)))
+    }
+
+    val subdirectories = directories.map(directory => (directory, subdirectoryOf(directory).map({
+      dir => {
+        val files = result._2.getOrElse(dir, List.empty)
+        files.map {
+          case PlainFile(n, s) => s
+          case _ => 0
+        }.sum
+      }
+    })))
+
     println(s"Result of puzzle 13 is: $result")
+    println(s"Result of puzzle 13 is: $subdirectories")
+    val subdirectoriesSize = subdirectories.map(t => (t._1, t._2.sum)).filter(fs => fs._2 < 100000)
+    println(subdirectoriesSize.map(_._2).sum)
   }
 }
 
