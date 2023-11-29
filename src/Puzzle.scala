@@ -1,500 +1,331 @@
+import java.text.SimpleDateFormat
+import java.util.Date
 import scala.io.Source
 
 trait Puzzle {
   def run(): Unit
+
 }
 
 object Puzzles {
   val sourceLists = (for {
-    i <- 1 to 14
+    i <- 1 to 5
   } yield Source.fromFile(s"/Users/martinetherton/Developer/projects/be/scala/adventofcode2022/advent2022/src/$i.txt").getLines.toList).toList
-  val puzzles = List(new Puzzle1(sourceLists(0)),
-    new Puzzle2(sourceLists(1)),
-    new Puzzle3(sourceLists(2)),
-    new Puzzle4(sourceLists(3)),
-    new Puzzle5(sourceLists(4)),
-    new Puzzle6(sourceLists(5)),
-    new Puzzle7(sourceLists(6)),
-    new Puzzle8(sourceLists(7)),
-    new Puzzle9(sourceLists(8)),
-    new Puzzle10(sourceLists(9)),
-    new Puzzle11(sourceLists(10)),
-    new Puzzle12(sourceLists(11)),
-    new Puzzle13(sourceLists(12)),
-    new Puzzle14(sourceLists(13))
+  val puzzles = List(
+    new Puzzle1(sourceLists(0)),
+    new Puzzle2(sourceLists(0)),
+    new Puzzle3(sourceLists(1)),
+    new Puzzle4(sourceLists(1)),
+    new Puzzle5(sourceLists(2)),
+    new Puzzle6(sourceLists(2)),
+    new Puzzle7(sourceLists(3)),
+    new Puzzle8(sourceLists(3)),
+    new Puzzle9(sourceLists(4)),
   )
-
 }
-
 
 case class Puzzle1(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val newc = l.foldLeft(List[List[String]](List()))((acc, el) => {
-      if (el.isEmpty) {
-        List() :: acc
-      } else {
-        acc match {
-          case h :: t => (el :: h) :: t
-        }
-      }
+    val result = l.sliding(2).toList.foldLeft(0)((acc, el) => el match {
+      case List(first, second) => if (second > first) acc + 1 else acc
     })
-    val result = newc.map(l => l.map(e => e.toInt).sum).max
-    println(s"Result of puzzle 1 is: $result")
+    println(s"Result of puzzle 1 is: ${result}")
   }
 }
 
 case class Puzzle2(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val newc = l.foldLeft(List[List[String]](List()))((acc, el) => {
-      if (el.isEmpty) {
-        List() :: acc
-      } else {
-        acc match {
-          case h :: t => (el :: h) :: t
-        }
-      }
+    val result = l.map(_.toInt).sliding(3).toList.foldLeft((0, Integer.MAX_VALUE))((acc, el) => el match {
+      case List(first, second, third) => if ((first + second + third) > acc._2) (acc._1 + 1, first + second + third) else (acc._1, first + second + third)
     })
-    val result = newc.map(l => l.map(e => e.toInt).sum).sorted.reverse.take(3).sum
-    println(s"Result of puzzle 2 is: $result")
+    println(s"Result of puzzle 2 is: ${result._1}")
   }
 }
 
 case class Puzzle3(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val result = l.map(el => el.split(" ")).map(arr => (arr(0), arr(1))).foldLeft(0)((acc, el) => el match {
-      case ("A", "X") => acc + 3 + 1
-      case ("A", "Y") => acc + 6 + 2
-      case ("A", "Z") => acc + 3
-      case ("B", "X") => acc + 1
-      case ("B", "Y") => acc + 3 + 2
-      case ("B", "Z") => acc + 6 + 3
-      case ("C", "X") => acc + 6 + 1
-      case ("C", "Y") => acc + 2
-      case ("C", "Z") => acc + 3 + 3
+    val commands = l.map(_.split(" ").toList).map(x => (x(0), x(1).toInt))
+    val result = commands.foldLeft((0,0))((acc, el) => el match {
+      case ("forward", x) => (acc._1 + x, acc._2)
+      case ("down", x) => (acc._1, acc._2 + x)
+      case (_, x) => (acc._1, acc._2 - x)
     })
-    println(s"Result of puzzle 3 is: $result")
+    println(s"Result of puzzle 3 is: ${result._1 * result._2}")
   }
 }
 
 case class Puzzle4(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val result = l.map(el => el.split(" ")).map(arr => (arr(0), arr(1))).foldLeft(0)((acc, el) => el match {
-      case ("A", "X") => acc + 3
-      case ("A", "Y") => acc + 3 + 1
-      case ("A", "Z") => acc + 6 + 2 //x
-      case ("B", "X") => acc + 1
-      case ("B", "Y") => acc + 3 + 2
-      case ("B", "Z") => acc + 6 + 3 //x
-      case ("C", "X") => acc + 2 //x
-      case ("C", "Y") => acc + 3 + 3
-      case ("C", "Z") => acc + 6 + 1
+    val commands = l.map(_.split(" ").toList).map(x => (x(0), x(1).toInt))
+    val result = commands.foldLeft((0,0,0))((acc, el) => el match {
+      case ("forward", x) => (acc._1 + x, (acc._2 + (acc._3 * x)), acc._3)
+      case ("down", x) => (acc._1, acc._2, acc._3 + x)
+      case (_, x) => (acc._1, acc._2, acc._3 - x)
     })
-    println(s"Result of puzzle 4 is: $result")
+    println(s"Result of puzzle 4 is: ${result._1 * result._2}")
   }
 }
 
 case class Puzzle5(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    val result = l.foldLeft(0)((acc, el) => {
-      val (first, second) = el.splitAt(el.length/2)
-      val prio = first.dropWhile(h => !second.contains(h)).head
-      acc + priorities.indexOf(prio) + 1
-    })
-    println(s"Result of puzzle 5 is: $result")
+    val gammaBinary = l.transpose.map(el => el.foldLeft((0, 0))((acc, i) => {
+      if (i == '0') (acc._1 + 1, acc._2) else (acc._1, acc._2 + 1)
+    })).map(x => if (x._1 > x._2) "0" else "1")
+    val epsilonBinary = gammaBinary.map(c => if (c == "0") "1" else "0")
+    println(s"Result of puzzle 5 is: ${Integer.parseInt(gammaBinary.mkString, 2) * Integer.parseInt(epsilonBinary.mkString, 2)}")
   }
 }
 
 case class Puzzle6(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    val group = l.grouped(3).toList
-    val result = group.foldLeft(0)((acc, el) => {
-      val prio = el(0).dropWhile(h => !(el(1).contains(h) && el(2).contains(h))).head
-      acc + priorities.indexOf(prio) + 1
-    })
-    println(s"Result of puzzle 6 is: $result")
+
+    def calc(ls: List[String], i: Int, f: (Int, Int) => Boolean): String = ls match {
+      case h :: Nil => h
+      case ls => {
+        val colToCheck = ls.transpose.toList(i)
+        val lsToFilter = ls.filter(el => {
+          val charToCheck = if (f(colToCheck.count(_ == '0'), colToCheck.count(_ == '1'))) '0' else '1'
+          el.charAt(i) == charToCheck
+        })
+        calc(lsToFilter, i + 1, f)
+      }
+    }
+    println(s"Result of puzzle 6 is: ${Integer.parseInt(calc(l, 0, (a, b) => a > b), 2) * Integer.parseInt(calc(l, 0, (a, b) => a <= b), 2)}")
+
   }
 }
 
 case class Puzzle7(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val list = l.map(el => el.split(",")).map(arr => (arr(0).split("-").map(_.toInt), arr(1).split("-").map(_.toInt)))
 
-    val result = list.foldLeft(0)((acc, tup) => {
-      if ((tup._1(0) >= tup._2(0) && tup._1(1) <= tup._2(1)) ||
-        (tup._2(0) >= tup._1(0) && tup._2(1) <= tup._1(1))) {
-          acc + 1
-      } else {
-        acc
+    val numberOfPossibleCards = l.size / 5
+    val realNumberOfCards = (l.size / 5) + (numberOfPossibleCards / 5)
+    var cardList = for {x <- 1 to realNumberOfCards} yield x
+    val numberPool = l.head.split(",").map(_.toInt).toList
+    val bingoCards: Seq[List[Int]] = l.tail.filter(!_.isEmpty)
+      .map(_.trim).map(s => (s.split("[ ]+")
+      .toList.map(_.toInt)))
+
+    println(bingoCards)
+
+    def checkForBingo(listToCheck: List[(Int, Int)]): (Int, Int) = {
+      val bingoRows = listToCheck.groupBy(_._1).filter(x => x._2.size > 4)
+      val bingoColumns = listToCheck.foldLeft(Map[Int, Map[Int, List[Int]]]())((acc, el) => {
+        if (!acc.keySet.contains(el._2)) {
+          // add column map
+          acc + (el._2 -> Map( el._1 / 5 -> List(bingoCards(el._1)(el._2))))
+        } else if (!acc(el._2).keySet.contains(el._1 / 5)) {
+          // add card map to column
+          val colMap: Map[Int, List[Int]] = acc(el._2)
+          val newColMap: Map[Int, List[Int]] = colMap + (el._1 / 5 -> List(bingoCards(el._1)(el._2)))
+          acc + (el._2 -> newColMap)
+        } else {
+          // add element to card map list
+          val cardList: List[Int] = acc(el._2)(el._1 / 5)
+          val newCardList = bingoCards(el._1)(el._2) :: cardList
+          val colMap: Map[Int, List[Int]] = acc(el._2)
+          val newColMap: Map[Int, List[Int]] = colMap + (el._1 / 5 -> newCardList)
+          acc + (el._2 -> newColMap)
+        }
+      })
+
+      val vals = for {
+        cols <- bingoColumns.keySet.toList
+        cards <- bingoColumns(cols).keySet.toList
+        if bingoColumns(cols)(cards).size > 4
+
+      } yield (cols, cards)
+
+      println("cols")
+
+      val mapped = bingoRows.map(s => List(s._1, s._2))
+
+      if (bingoRows.size > 0) {
+        val lastNumber = bingoCards(listToCheck.head._1)(listToCheck.head._2)
+        val card = (bingoRows.head._1 / 5) + 1
+        val start = (card - 1) * 5
+        val end = ((card - 1) * 5) + 4
+        val possibleSquares = for {
+          rowNum <- start to end
+          col <- 0 to 4
+        } yield (rowNum, col)
+        val emptySquares = possibleSquares.filterNot(tup => listToCheck.contains(tup)).map(x => bingoCards(x._1)(x._2)).sum
+        val result = emptySquares * lastNumber
+
+        println("here")
+        println(result)
+        println(mapped)
+        println(mapped.transpose)
+        println("there")
+        (bingoRows.head._1, 0)
+      } else if (vals.size > 0) {
+        val lastNumber = bingoCards(listToCheck.head._1)(listToCheck.head._2)
+        val card = vals.head._2 + 1
+        val start = (card - 1) * 5
+        val end = ((card - 1) * 5) + 4
+        val possibleSquares = for {
+          rowNum <- start to end
+          col <- 0 to 4
+        } yield (rowNum, col)
+        val emptySquares = possibleSquares.filterNot(tup => listToCheck.contains(tup)).map(x => bingoCards(x._1)(x._2)).sum
+        val result = emptySquares * lastNumber
+        println("here")
+        println(mapped)
+        println(mapped.transpose)
+        println("there")
+        (vals.head._1, 0)
+      } else (0,0)
+    }
+
+    def loop(numbersToChooseFrom: List[Int], acc: List[(Int, Int)]): (Int, Int, List[(Int, Int)]) = numbersToChooseFrom match {
+      case h :: t => {
+        val chosenNumbers = for {
+          i <- 0 to bingoCards.size - 1
+          m = bingoCards(i).indexOf(h)
+          if m != -1
+        } yield (i, m)
+        val solution = checkForBingo(chosenNumbers.toList ::: acc)
+        if (solution._1 == 0)
+          loop(t, chosenNumbers.toList ::: acc)
+        else
+          (0,0,List())
       }
-    })
+    }
+    val result = loop(numberPool, List())
+    println(result)
 
-    println(s"Result of puzzle 7 is: $result")
   }
 }
 
 case class Puzzle8(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val list = l.map(el => el.split(",")).map(arr => (arr(0).split("-").map(_.toInt), arr(1).split("-").map(_.toInt)))
+    val numberPool = l.head.split(",").map(_.toInt).toList
+    // begin state, numberPool, all the Bingo cards, each square starts with false,
+    // on reading the number we process all the cards and set the matching squares to true
 
-    val result = list.foldLeft(0)((acc, tup) => {
-      if (tup._1(0) <= tup._2(1) && tup._1(1) >= tup._2(0)) {
-        acc + 1
-      } else {
-        acc
+    type BingoSquare = (Int, Boolean)
+    case class BingoBoard(rowSquares: List[List[BingoSquare]], columnSquares: List[List[BingoSquare]], resolved: (Boolean, String)) {
+    }
+    case class BingoGame(number: Int, boards: List[BingoBoard]) {
+      def run: BingoGame = {
+
+        val newBoards = for {
+          board <- boards
+          if board.resolved._1 == false
+          rowSquares = board.rowSquares.map(s => s.map(d => if (d._1 == number) (d._1, true) else d))
+          colSquares = board.columnSquares.map(s => s.map(d => if (d._1 == number) (d._1, true) else d))
+          rowsToResolve = rowSquares.map(r => r.filter(s => s._2 == true).size > 4)
+          colsToResolve = colSquares.map(r => r.filter(s => s._2 == true).size > 4)
+          resolvedRows = rowsToResolve.contains(true)
+          resolvedCols = colsToResolve.contains(true)
+          resolved = resolvedRows || resolvedCols
+          dateResolved = if (resolved) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS").format(new Date()) else null
+        } yield BingoBoard(rowSquares, colSquares, (resolved, dateResolved))
+        // we now want to loop over all the boards and check whether any row or column is
+        BingoGame(number, newBoards)
       }
-    })
+    }
 
-    println(s"Result of puzzle 8 is: $result")
+    val boards = l.tail.filter(!_.isEmpty)
+      .map(_.trim).map(s => (s.split("[ ]+")
+      .toList.map(_.toInt)))
+    val listBingoBoards = for {
+      rowNum <- 0 to boards.size / 5 - 1
+      rows = boards.slice(rowNum * 5, (rowNum + 1) * 5)
+      rowSquares = rows.map(l => l.map(a => (a, false)))
+      columnSquares = rows.transpose.map(d => d.map(x => (x, false)))
+    } yield BingoBoard(rowSquares, columnSquares, (false, null))
+
+    def loop(numbers: List[Int], bingoGame: BingoGame): BingoGame = numbers match {
+      case List() => {
+        println(s"last Game resolved is" + bingoGame.boards.sortBy(d => d.resolved._2).reverse.head)
+        bingoGame
+      }
+      case h :: t if bingoGame.boards.forall(p => p.resolved._1 == true) => {
+        val lastGame = bingoGame.boards.sortBy(d => d.resolved._2).reverse.head
+        println(s"last Game resolved is" + lastGame)
+        val total = lastGame.rowSquares.map(sq => sq.filter(_._2 == false)).flatten.map(_._1).sum * bingoGame.number
+        bingoGame
+      }
+      case h :: t => loop(t, BingoGame(h, bingoGame.boards).run)
+    }
+    loop(numberPool.tail, BingoGame(numberPool.head, listBingoBoards.toList).run)
+println(listBingoBoards)
   }
 }
 
 case class Puzzle9(l: List[String]) extends Puzzle {
   override def run(): Unit = {
-    val Pattern = "move.*".r
-    val NumberPattern = " 1.*".r
-    val result = l.foldLeft(List[List[String]](List(), List(), List(), List(), List(), List(), List(), List(), List()): List[List[String]])((acc, el) => el match {
-      case "" => List(acc(0).reverse, acc(1).reverse, acc(2).reverse, acc(3).reverse, acc(4).reverse, acc(5).reverse, acc(6).reverse, acc(7).reverse, acc(8).reverse)
-      case Pattern() => {
-        val moves = el.split(" ").toList.filter(e => e.forall(Character.isDigit)).map(_.toInt)
-        val letterToMove = acc(moves(1) - 1).take(moves(0)).reverse
-        val acc0 = if (moves(1) - 1 == 0) {
-          acc(moves(1) - 1).drop(moves(0))
-        } else if (moves(2) - 1 == 0) {
-          letterToMove ::: acc(0)
-        } else {
-          acc(0)
-        }
-        val acc1 = if (moves(1) - 1 == 1) {
-          acc(1).drop(moves(0))
-        } else if (moves(2) - 1 == 1) {
-          letterToMove ::: acc(1)
-        } else {
-          acc(1)
-        }
-        val acc2 = if (moves(1) - 1 == 2) {
-          acc(2).drop(moves(0))
-        } else if (moves(2) - 1 == 2) {
-          letterToMove ::: acc(2)
-        } else {
-          acc(2)
-        }
-        val acc3 = if (moves(1) - 1 == 3) {
-          acc(3).drop(moves(0))
-        } else if (moves(2) - 1 == 3) {
-          letterToMove ::: acc(3)
-        } else {
-          acc(3)
-        }
-        val acc4 = if (moves(1) - 1 == 4) {
-          acc(4).drop(moves(0))
-        } else if (moves(2) - 1 == 4) {
-          letterToMove ::: acc(4)
-        } else {
-          acc(4)
-        }
-        val acc5 = if (moves(1) - 1 == 5) {
-          acc(5).drop(moves(0))
-        } else if (moves(2) - 1 == 5) {
-          letterToMove ::: acc(5)
-        } else {
-          acc(5)
-        }
-        val acc6 = if (moves(1) - 1 == 6) {
-          acc(6).drop(moves(0))
-        } else if (moves(2) - 1 == 6) {
-          letterToMove ::: acc(6)
-        } else {
-          acc(6)
-        }
-        val acc7 = if (moves(1) - 1 == 7) {
-          acc(7).drop(moves(0))
-        } else if (moves(2) - 1 == 7) {
-          letterToMove ::: acc(7)
-        } else {
-          acc(7)
-        }
-        val acc8 = if (moves(1) - 1 == 8) {
-          acc(8).drop(moves(0))
-        } else if (moves(2) - 1 == 8) {
-          letterToMove ::: acc(8)
-        } else {
-          acc(8)
-        }
+    //val lines = l.map(_.toInt).toList
+    // begin state, numberPool, all the Bingo cards, each square starts with false,
+    // on reading the number we process all the cards and set the matching squares to true
 
-        val newAcc = List(acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
-        newAcc
-      }
-      case NumberPattern() => acc
-      case line => {
-        val acc0: List[String] = if (!line.charAt(1).isWhitespace && !line.charAt(1).isDigit ) { line.charAt(1).toString :: acc(0)} else {acc(0)}
-        val acc1: List[String] = if (!line.charAt(5).isWhitespace && !line.charAt(5).isDigit ) {line.charAt(5).toString :: acc(1)} else {acc(1)}
-        val acc2: List[String] = if (!line.charAt(9).isWhitespace && !line.charAt(9).isDigit ) {line.charAt(9).toString :: acc(2)} else {acc(2)}
-        val acc3: List[String] = if (!line.charAt(13).isWhitespace && !line.charAt(13).isDigit ) {line.charAt(13).toString :: acc(3)} else {acc(3)}
-        val acc4: List[String] = if (!line.charAt(17).isWhitespace && !line.charAt(17).isDigit ) {line.charAt(17).toString :: acc(4)} else {acc(4)}
-        val acc5: List[String] = if (!line.charAt(21).isWhitespace && !line.charAt(21).isDigit ) {line.charAt(21).toString :: acc(5)} else {acc(5)}
-        val acc6: List[String] = if (!line.charAt(25).isWhitespace && !line.charAt(25).isDigit ) {line.charAt(25).toString :: acc(6)} else {acc(6)}
-        val acc7: List[String] = if (!line.charAt(29).isWhitespace && !line.charAt(29).isDigit ) {line.charAt(29).toString :: acc(7)} else {acc(7)}
-        val acc8: List[String] = if (!line.charAt(33).isWhitespace && !line.charAt(33).isDigit ) {line.charAt(33).toString :: acc(8)} else {acc(8)}
-        List[List[String]](acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
-      }
-    }).map(l => l.head).mkString
-    println(s"Result of puzzle 9 is: $result")
-  }
-}
-
-case class Puzzle10(l: List[String]) extends Puzzle {
-  override def run(): Unit = {
-
-    val Pattern = "move.*".r
-    val NumberPattern = " 1.*".r
-    val result = l.foldLeft(List[List[String]](List(), List(), List(), List(), List(), List(), List(), List(), List()): List[List[String]])((acc, el) => el match {
-      case "" => List(acc(0).reverse, acc(1).reverse, acc(2).reverse, acc(3).reverse, acc(4).reverse, acc(5).reverse, acc(6).reverse, acc(7).reverse, acc(8).reverse)
-      case Pattern() => {
-        val moves = el.split(" ").toList.filter(e => e.forall(Character.isDigit)).map(_.toInt)
-        val letterToMove = acc(moves(1) - 1).take(moves(0))//.reverse
-        val acc0 = if (moves(1) - 1 == 0) {
-          acc(moves(1) - 1).drop(moves(0))
-        } else if (moves(2) - 1 == 0) {
-          letterToMove ::: acc(0)
-        } else {
-          acc(0)
-        }
-        val acc1 = if (moves(1) - 1 == 1) {
-          acc(1).drop(moves(0))
-        } else if (moves(2) - 1 == 1) {
-          letterToMove ::: acc(1)
-        } else {
-          acc(1)
-        }
-        val acc2 = if (moves(1) - 1 == 2) {
-          acc(2).drop(moves(0))
-        } else if (moves(2) - 1 == 2) {
-          letterToMove ::: acc(2)
-        } else {
-          acc(2)
-        }
-        val acc3 = if (moves(1) - 1 == 3) {
-          acc(3).drop(moves(0))
-        } else if (moves(2) - 1 == 3) {
-          letterToMove ::: acc(3)
-        } else {
-          acc(3)
-        }
-        val acc4 = if (moves(1) - 1 == 4) {
-          acc(4).drop(moves(0))
-        } else if (moves(2) - 1 == 4) {
-          letterToMove ::: acc(4)
-        } else {
-          acc(4)
-        }
-        val acc5 = if (moves(1) - 1 == 5) {
-          acc(5).drop(moves(0))
-        } else if (moves(2) - 1 == 5) {
-          letterToMove ::: acc(5)
-        } else {
-          acc(5)
-        }
-        val acc6 = if (moves(1) - 1 == 6) {
-          acc(6).drop(moves(0))
-        } else if (moves(2) - 1 == 6) {
-          letterToMove ::: acc(6)
-        } else {
-          acc(6)
-        }
-        val acc7 = if (moves(1) - 1 == 7) {
-          acc(7).drop(moves(0))
-        } else if (moves(2) - 1 == 7) {
-          letterToMove ::: acc(7)
-        } else {
-          acc(7)
-        }
-        val acc8 = if (moves(1) - 1 == 8) {
-          acc(8).drop(moves(0))
-        } else if (moves(2) - 1 == 8) {
-          letterToMove ::: acc(8)
-        } else {
-          acc(8)
-        }
-
-        val newAcc = List(acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
-        newAcc
-      }
-      case NumberPattern() => acc
-      case line => {
-        val acc0: List[String] = if (!line.charAt(1).isWhitespace && !line.charAt(1).isDigit) {
-          line.charAt(1).toString :: acc(0)
-        } else {
-          acc(0)
-        }
-        val acc1: List[String] = if (!line.charAt(5).isWhitespace && !line.charAt(5).isDigit) {
-          line.charAt(5).toString :: acc(1)
-        } else {
-          acc(1)
-        }
-        val acc2: List[String] = if (!line.charAt(9).isWhitespace && !line.charAt(9).isDigit) {
-          line.charAt(9).toString :: acc(2)
-        } else {
-          acc(2)
-        }
-        val acc3: List[String] = if (!line.charAt(13).isWhitespace && !line.charAt(13).isDigit) {
-          line.charAt(13).toString :: acc(3)
-        } else {
-          acc(3)
-        }
-        val acc4: List[String] = if (!line.charAt(17).isWhitespace && !line.charAt(17).isDigit) {
-          line.charAt(17).toString :: acc(4)
-        } else {
-          acc(4)
-        }
-        val acc5: List[String] = if (!line.charAt(21).isWhitespace && !line.charAt(21).isDigit) {
-          line.charAt(21).toString :: acc(5)
-        } else {
-          acc(5)
-        }
-        val acc6: List[String] = if (!line.charAt(25).isWhitespace && !line.charAt(25).isDigit) {
-          line.charAt(25).toString :: acc(6)
-        } else {
-          acc(6)
-        }
-        val acc7: List[String] = if (!line.charAt(29).isWhitespace && !line.charAt(29).isDigit) {
-          line.charAt(29).toString :: acc(7)
-        } else {
-          acc(7)
-        }
-        val acc8: List[String] = if (!line.charAt(33).isWhitespace && !line.charAt(33).isDigit) {
-          line.charAt(33).toString :: acc(8)
-        } else {
-          acc(8)
-        }
-        List[List[String]](acc0, acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8)
-      }
-    }).map(l => l.head).mkString
-    println(s"Result of puzzle 10 is: $result")
-  }
-}
-
-
-case class Puzzle11(l: List[String]) extends Puzzle {
-  override def run(): Unit = {
-
-    val line: String = l.head
-    val result = line.foldLeft((0, 0, 0))((acc, letter) => {
-      if (acc._3 != 0 || acc._2 == 0) {
-        (acc._1, acc._2 + 1, acc._3)
-      //} //else if (acc._2 < 4) {
-       // (acc._1, acc._2 + 1, acc._3)
-      } else {
-        // this is happy flow when we find valid letter
-        val sub = line.substring(acc._1, acc._2)
-        if (!sub.contains(letter) && acc._2 >= acc._1 + 3) {
-          (acc._1, acc._2, acc._2 + 1)
-        } else {
-          val newFirst = sub.indexOf(letter) + acc._1 + 1
-          (newFirst, acc._2 + 1, 0)
-        }
-      }
-    })
-
-
-    println(s"Result of puzzle 11 is: ${result._3}")
-  }
-}
-
-case class Puzzle12(l: List[String]) extends Puzzle {
-  override def run(): Unit = {
-
-    val line: String = l.head
-    val result = line.foldLeft((0, 0, 0))((acc, letter) => {
-      if (acc._3 != 0 || acc._2 == 0) {
-        (acc._1, acc._2 + 1, acc._3)
-        //} //else if (acc._2 < 4) {
-        // (acc._1, acc._2 + 1, acc._3)
-      } else {
-        // this is happy flow when we find valid letter
-        val sub = line.substring(acc._1, acc._2)
-        if (!sub.contains(letter) && acc._2 >= acc._1 + 13) {
-          (acc._1, acc._2, acc._2 + 1)
-        } else {
-          val newFirst = sub.indexOf(letter) + acc._1 + 1
-          (newFirst, acc._2 + 1, 0)
-        }
-      }
-    })
-
-
-    println(s"Result of puzzle 12 is: ${result._3}")
-  }
-}
-
-
-case class Puzzle13(l: List[String]) extends Puzzle {
-
-  trait FileElement
-  case class Directory(name: String, fileElements: Set[FileElement]) extends FileElement
-  case class PlainFile(name: String, fileSize: Int) extends FileElement
-  case class File(name: String, fileType: String, fileSize: Int, children: List[File], parent: File)
-
-  override def run(): Unit = {
-
-    val Root = "\\$ cd /".r
-    val Ls = "\\$ ls".r
-    val Dir = raw"dir (.*)".r
-    val FileMatcher = raw"([0-9].*) (.*)".r
-    val Cd = "\\$ cd (.*)".r
-    val BackCd = "\\$ cd ..".r
-
-    type FileStructure = Map[List[String], Set[FileElement]]
-
-    val result: (List[String], FileStructure) = l.foldLeft((List.empty[String], Map.empty: FileStructure)) {
-      case ((path, content), line) => line match {
-        case Cd(dirname) => dirname match {
-          case ".." => (path.init, content)
-          case _ => (path :+ dirname, content)
-        }
-        case Ls() => (path, content)
-        case Dir(dirname) => (path,content + (path -> (content.getOrElse(path,Set.empty[FileElement]) + Directory(dirname, Set.empty))))
-        case FileMatcher(fileSize, fileName) => (path,content + (path -> (content.getOrElse(path,Set.empty[FileElement]) + PlainFile(fileName, fileSize.toInt))))
-        case _ => (path, content)
+    case class Point(x: Int, y: Int)
+    case class Line(p1: Point, p2: Point) {
+      def intersectingPoints: List[Point] = (p1, p2) match {
+        case (Point(x1, y1), Point(x2, y2)) if x1 == x2 =>
+          if (y1 < y2) {
+            (for {
+              y <- y1 to y2
+            } yield Point(x1, y)).toList
+          } else {
+            (for {
+              y <- y2 to y1
+            } yield Point(x1, y)).toList
+          }
+        case (Point(x1, y1), Point(x2, y2)) if y1 == y2 =>
+          if (x1 < x2) {
+            (for {
+              x <- x1 to x2
+            } yield Point(x, y1)).toList
+          } else {
+            (for {
+              x <- x2 to x1
+            } yield Point(x, y1)).toList
+          }
+        case (Point(x1, y1), Point(x2, y2)) if (y2 - y1).abs == (x2 - x1).abs =>
+          if ((x1 < x2) && (y1 < y2)) {
+            (for {
+              x <- x1 to x2
+              y = y1 + x - x1
+            } yield Point(x, y)).toList
+          } else if ((x1 < x2) && (y2 < y1)) {
+            (for {
+              x <- x1 to x2
+              y = y2 + x2 - x
+            } yield Point(x, y)).toList
+          } else if ((x2 < x1) && (y1 < y2)) {
+            (for {
+              x <- x2 to x1
+              y = y2 + x2 - x
+            } yield Point(x, y)).toList
+          } else if ((x2 < x1) && (y2 < y1)) {
+            (for {
+              x <- x2 to x1
+              y = y2 + x - x2
+            } yield Point(x, y)).toList
+          } else {
+            List()
+          }
+        case _ => List()
       }
     }
 
+    val lines = for {
+      xs <- l.map(s => s.split("->").map(c => c.split(",").toList.map(_.trim.toInt)))
+      p1 = Point(xs(0)(0), xs(0)(1))
+      p2 = Point(xs(1)(0), xs(1)(1))
+    } yield Line(p1, p2)
 
-    val directories = result._2.keySet.toList//.sortBy(_.size)
+  //  println(lines)
 
-    def subdirectoryOf(value: List[String]): List[List[String]] = {
-      directories.filter(dirs => value.forall(d => dirs.contains(d)))
-    }
-
-    val subdirectories = directories.map(directory => (directory, subdirectoryOf(directory).map({
-      dir => {
-        val files = result._2.getOrElse(dir, List.empty)
-        files.map {
-          case PlainFile(n, s) => s
-          case _ => 0
-        }.sum
-      }
-    })))
-
-    println(s"Result of puzzle 13 is: $result")
-    println(s"Result of puzzle 13 is: $subdirectories")
-    val subdirectoriesSize = subdirectories.map(t => (t._1, t._2.sum)).filter(fs => fs._2 < 100000)
-    println(subdirectoriesSize.map(_._2).sum)
-  }
-}
+    val points = (for {
+      l <- lines
+      points = l.intersectingPoints
+    } yield points).flatten
+    //println(points)
+    println(points.groupBy(identity).mapValues(_.size).toMap.filter(s => s._2 >= 2).size)
 
 
-case class Puzzle14(l: List[String]) extends Puzzle {
-
-
-
-  override def run(): Unit = {
-
-
-
-
-
-    println(s"Result of puzzle 14 is: ")
   }
 }
